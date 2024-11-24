@@ -1,12 +1,14 @@
 #define reverse 1
-//#define SERIAL_DEBUG 1
 
 #define FASTLED_INTERNAL
 #include <FastLED.h>
 
+#define MOSFET_GATE_PIN 7
 #define DATA_PIN 6
 
 #define NUM_LEDS 25
+
+#define THIRTY_MINUTES 1800000
 
 CRGB leds[NUM_LEDS];
 
@@ -25,10 +27,9 @@ static const CRGB AMBER = CRGB(255,  64,  32);
 struct Facts facts[NUM_LEDS];
 
 void setup() {
-    #ifdef SERIAL_DEBUG
-        Serial.begin(9600);
-        Serial.println("hello world");
-    #endif
+    pinMode(MOSFET_GATE_PIN, OUTPUT);
+    digitalWrite(MOSFET_GATE_PIN, LOW); // Keep power on
+
     // pinMode(RELAY_PIN,INPUT_PULLUP);
     FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);
 
@@ -73,6 +74,9 @@ void loop() {
     }
     for (i=0; i<10; i++) {
         wave_ramp();
+    }
+    if (millis() > THIRTY_MINUTES) {
+        digitalWrite(MOSFET_GATE_PIN, HIGH);  // turn off power to arduino
     }
 }
 
